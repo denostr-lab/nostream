@@ -34,5 +34,8 @@ dist
 # Env files
 *.env
 
+# Docker Compose files
+docker-compose.override.yml
+
 # Nostr data folder
 .nostr
