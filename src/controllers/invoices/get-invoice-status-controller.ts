@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { createLogger } from '../../factories/logger-factory'
 import { IController } from '../../@types/controllers'
 import { IInvoiceRepository } from '../../@types/repositories'
+import { withPubSubWatcher } from '../../utils/with-pubsub-watcher'
 
 const debug = createLogger('get-invoice-status-controller')
 
@@ -26,7 +27,10 @@ export class GetInvoiceStatusController implements IController {
 
     try {
       debug('fetching invoice: %s', invoiceId)
-      const invoice = await this.invoiceRepository.findById(invoiceId)
+      const invoice = await withPubSubWatcher(
+        `${invoiceId}:watch`,
+        () => this.invoiceRepository.findById(invoiceId)
+      )()
 
       if (!invoice) {
         debug('invoice not found: %s', invoiceId)
